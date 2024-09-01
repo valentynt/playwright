@@ -25,7 +25,7 @@ test.describe("Registration Form Tests", () => {
 
     await expect(page).toHaveURL("https://qauto.forstudy.space/panel/garage");
   });
-
+  // Negative scenario
   test('Empty "Name" field', async ({ page }) => {
     await page.getByRole("button", { name: "Sign up" }).click();
     await page.locator("#signupName").click();
@@ -36,12 +36,10 @@ test.describe("Registration Form Tests", () => {
     await page.getByLabel("Password", { exact: true }).click();
     await expect(page.getByRole("paragraph")).toContainText("Name required");
 
-    const borderColor = await page.evaluate(
-      () =>
-        getComputedStyle(document.querySelector('input[name="name"]'))
-          .borderColor
-    );
-    expect(borderColor).toBe("rgb(220, 53, 69)");
+    const hasErrorClass = await page
+      .locator('input[name="name"]')
+      .evaluate((element) => element.classList.contains("is-invalid"));
+    expect(hasErrorClass).toBeTruthy();
   });
 
   test('Invalid "Name" data', async ({ page }) => {
@@ -53,12 +51,10 @@ test.describe("Registration Form Tests", () => {
     await page.getByLabel("Re-enter password").fill("Password123");
     await expect(page.getByRole("paragraph")).toContainText("Name is invalid");
 
-    const borderColor = await page.evaluate(
-      () =>
-        getComputedStyle(document.querySelector('input[name="name"]'))
-          .borderColor
-    );
-    expect(borderColor).toBe("rgb(220, 53, 69)");
+    const hasErrorClass = await page
+      .locator('input[name="name"]')
+      .evaluate((element) => element.classList.contains("is-invalid"));
+    expect(hasErrorClass).toBeTruthy();
   });
 
   test('Wrong "Name" length', async ({ page }) => {
@@ -72,12 +68,10 @@ test.describe("Registration Form Tests", () => {
       "Name has to be from 2 to 20 characters long"
     );
 
-    const borderColor = await page.evaluate(
-      () =>
-        getComputedStyle(document.querySelector('input[name="name"]'))
-          .borderColor
-    );
-    expect(borderColor).toBe("rgb(220, 53, 69)");
+    const hasErrorClass = await page
+      .locator('input[name="name"]')
+      .evaluate((element) => element.classList.contains("is-invalid"));
+    expect(hasErrorClass).toBeTruthy();
   });
 
   test('Empty "Last name" field', async ({ page }) => {
@@ -91,12 +85,10 @@ test.describe("Registration Form Tests", () => {
       "Last name required"
     );
 
-    const borderColor = await page.evaluate(
-      () =>
-        getComputedStyle(document.querySelector('input[name="lastName"]'))
-          .borderColor
-    );
-    expect(borderColor).toBe("rgb(220, 53, 69)");
+    const hasErrorClass = await page
+      .locator('input[name="lastName"]')
+      .evaluate((element) => element.classList.contains("is-invalid"));
+    expect(hasErrorClass).toBeTruthy();
   });
 
   test('Invalid "Last name" data', async ({ page }) => {
@@ -110,12 +102,10 @@ test.describe("Registration Form Tests", () => {
       "Last name is invalid"
     );
 
-    const borderColor = await page.evaluate(
-      () =>
-        getComputedStyle(document.querySelector('input[name="lastName"]'))
-          .borderColor
-    );
-    expect(borderColor).toBe("rgb(220, 53, 69)");
+    const hasErrorClass = await page
+      .locator('input[name="lastName"]')
+      .evaluate((element) => element.classList.contains("is-invalid"));
+    expect(hasErrorClass).toBeTruthy();
   });
 
   test('Wrong "Last name" length', async ({ page }) => {
@@ -129,12 +119,10 @@ test.describe("Registration Form Tests", () => {
       "Last name has to be from 2 to 20 characters long"
     );
 
-    const borderColor = await page.evaluate(
-      () =>
-        getComputedStyle(document.querySelector('input[name="lastName"]'))
-          .borderColor
-    );
-    expect(borderColor).toBe("rgb(220, 53, 69)");
+    const hasErrorClass = await page
+      .locator('input[name="lastName"]')
+      .evaluate((element) => element.classList.contains("is-invalid"));
+    expect(hasErrorClass).toBeTruthy();
   });
 
   test('Invalid "Email" format', async ({ page }) => {
@@ -148,12 +136,10 @@ test.describe("Registration Form Tests", () => {
       "Email is incorrect"
     );
 
-    const borderColor = await page.evaluate(
-      () =>
-        getComputedStyle(document.querySelector('input[name="email"]'))
-          .borderColor
-    );
-    expect(borderColor).toBe("rgb(220, 53, 69)");
+    const hasErrorClass = await page
+      .locator('input[name="email"]')
+      .evaluate((element) => element.classList.contains("is-invalid"));
+    expect(hasErrorClass).toBeTruthy();
   });
 
   test('Empty "Email" field', async ({ page }) => {
@@ -165,12 +151,10 @@ test.describe("Registration Form Tests", () => {
     await page.getByLabel("Re-enter password").fill("Password123");
     await expect(page.getByRole("paragraph")).toContainText("Email required");
 
-    const borderColor = await page.evaluate(
-      () =>
-        getComputedStyle(document.querySelector('input[name="email"]'))
-          .borderColor
-    );
-    expect(borderColor).toBe("rgb(220, 53, 69)");
+    const hasErrorClass = await page
+      .locator('input[name="email"]')
+      .evaluate((element) => element.classList.contains("is-invalid"));
+    expect(hasErrorClass).toBeTruthy();
   });
 
   test('Invalid "Password" data - Less than 8 characters', async ({ page }) => {
@@ -184,12 +168,10 @@ test.describe("Registration Form Tests", () => {
       "Password has to be from 8 to 15 characters long and contain at least one integer, one capital, and one small letter"
     );
 
-    const borderColor = await page.evaluate(
-      () =>
-        getComputedStyle(document.querySelector('input[name="password"]'))
-          .borderColor
-    );
-    expect(borderColor).toBe("rgb(196, 143, 162)");
+    const hasErrorClass = await page
+      .locator('input[name="password"]')
+      .evaluate((element) => element.classList.contains("is-invalid"));
+    expect(hasErrorClass).toBeTruthy();
   });
 
   test('Invalid "Password" data - No capital letter', async ({ page }) => {
@@ -203,12 +185,10 @@ test.describe("Registration Form Tests", () => {
       "Password has to be from 8 to 15 characters long and contain at least one integer, one capital, and one small letter"
     );
 
-    const borderColor = await page.evaluate(
-      () =>
-        getComputedStyle(document.querySelector('input[name="password"]'))
-          .borderColor
-    );
-    expect(borderColor).toBe("rgb(184, 140, 166)");
+    const hasErrorClass = await page
+      .locator('input[name="password"]')
+      .evaluate((element) => element.classList.contains("is-invalid"));
+    expect(hasErrorClass).toBeTruthy();
   });
 
   test('Invalid "Password" data - No digit', async ({ page }) => {
@@ -222,12 +202,10 @@ test.describe("Registration Form Tests", () => {
       "Password has to be from 8 to 15 characters long and contain at least one integer, one capital, and one small letter"
     );
 
-    const borderColor = await page.evaluate(
-      () =>
-        getComputedStyle(document.querySelector('input[name="password"]'))
-          .borderColor
-    );
-    expect(borderColor).toBe("rgb(211, 88, 105)");
+    const hasErrorClass = await page
+      .locator('input[name="password"]')
+      .evaluate((element) => element.classList.contains("is-invalid"));
+    expect(hasErrorClass).toBeTruthy();
   });
 
   test('Empty "Password" field', async ({ page }) => {
@@ -241,12 +219,10 @@ test.describe("Registration Form Tests", () => {
       "Password required"
     );
 
-    const borderColor = await page.evaluate(
-      () =>
-        getComputedStyle(document.querySelector('input[name="password"]'))
-          .borderColor
-    );
-    expect(borderColor).toBe("rgb(196, 112, 135)");
+    const hasErrorClass = await page
+      .locator('input[name="password"]')
+      .evaluate((element) => element.classList.contains("is-invalid"));
+    expect(hasErrorClass).toBeTruthy();
   });
 
   test("Passwords do not match", async ({ page }) => {
@@ -261,12 +237,10 @@ test.describe("Registration Form Tests", () => {
       "Passwords do not match"
     );
 
-    const borderColor = await page.evaluate(
-      () =>
-        getComputedStyle(document.querySelector('input[name="repeatPassword"]'))
-          .borderColor
-    );
-    expect(borderColor).toBe("rgb(187, 109, 138)");
+    const hasErrorClass = await page
+      .locator('input[name="repeatPassword"]')
+      .evaluate((element) => element.classList.contains("is-invalid"));
+    expect(hasErrorClass).toBeTruthy();
   });
 
   test('Empty "Re-enter password" field', async ({ page }) => {
@@ -281,12 +255,10 @@ test.describe("Registration Form Tests", () => {
       "Re-enter password required"
     );
 
-    const borderColor = await page.evaluate(
-      () =>
-        getComputedStyle(document.querySelector('input[name="repeatPassword"]'))
-          .borderColor
-    );
-    expect(borderColor).toBe("rgb(187, 109, 138)");
+    const hasErrorClass = await page
+      .locator('input[name="repeatPassword"]')
+      .evaluate((element) => element.classList.contains("is-invalid"));
+    expect(hasErrorClass).toBeTruthy();
   });
 
   test('Button "Register" is disabled when fields are empty', async ({
