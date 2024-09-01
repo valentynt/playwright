@@ -15,11 +15,11 @@ test.describe("Registration Form Tests", () => {
     emailPrefix = `aqa_${generateRandomPrefix()}`;
     registrationPage = new RegistrationPage(page);
     await registrationPage.navigate();
+    await registrationPage.signUpButton.click();
   });
 
   // Positive scenario
   test("Successful Registration", async ({ page }) => {
-    await registrationPage.signUpButton.click();
     await registrationPage.fillRegistrationForm({
       name: "John",
       lastName: "Doe",
@@ -34,7 +34,6 @@ test.describe("Registration Form Tests", () => {
 
   // Negative scenarios
   test('Empty "Name" field', async ({ page }) => {
-    await registrationPage.signUpButton.click();
     await registrationPage.nameInput.click();
     await registrationPage.fillRegistrationForm({
       lastName: "Doe",
@@ -53,7 +52,6 @@ test.describe("Registration Form Tests", () => {
   });
 
   test('Invalid "Name" data', async ({ page }) => {
-    await registrationPage.signUpButton.click();
     await registrationPage.fillRegistrationForm({
       name: "123",
       lastName: "Doe",
@@ -73,7 +71,6 @@ test.describe("Registration Form Tests", () => {
   });
 
   test('Wrong "Name" length', async ({ page }) => {
-    await registrationPage.signUpButton.click();
     await registrationPage.fillRegistrationForm({
       name: "A",
       lastName: "Doe",
@@ -95,7 +92,6 @@ test.describe("Registration Form Tests", () => {
   });
 
   test('Empty "Last name" field', async ({ page }) => {
-    await registrationPage.signUpButton.click();
     await registrationPage.lastNameInput.click();
     await registrationPage.fillRegistrationForm({
       name: "John",
@@ -114,7 +110,6 @@ test.describe("Registration Form Tests", () => {
   });
 
   test('Invalid "Last name" data', async ({ page }) => {
-    await registrationPage.signUpButton.click();
     await registrationPage.fillRegistrationForm({
       name: "John",
       lastName: "123",
@@ -133,7 +128,6 @@ test.describe("Registration Form Tests", () => {
   });
 
   test('Wrong "Last name" length', async ({ page }) => {
-    await registrationPage.signUpButton.click();
     await registrationPage.fillRegistrationForm({
       name: "John",
       lastName: "A",
@@ -154,7 +148,6 @@ test.describe("Registration Form Tests", () => {
   });
 
   test('Invalid "Email" format', async ({ page }) => {
-    await registrationPage.signUpButton.click();
     await registrationPage.fillRegistrationForm({
       name: "John",
       lastName: "Doe",
@@ -173,7 +166,6 @@ test.describe("Registration Form Tests", () => {
   });
 
   test('Empty "Email" field', async ({ page }) => {
-    await registrationPage.signUpButton.click();
     await registrationPage.emailInput.click();
     await registrationPage.fillRegistrationForm({
       name: "John",
@@ -192,7 +184,6 @@ test.describe("Registration Form Tests", () => {
   });
 
   test('Invalid "Password" data - Less than 8 characters', async ({ page }) => {
-    await registrationPage.signUpButton.click();
     await registrationPage.fillRegistrationForm({
       name: "John",
       lastName: "Doe",
@@ -213,7 +204,6 @@ test.describe("Registration Form Tests", () => {
   });
 
   test('Invalid "Password" data - No capital letter', async ({ page }) => {
-    await registrationPage.signUpButton.click();
     await registrationPage.fillRegistrationForm({
       name: "John",
       lastName: "Doe",
@@ -234,7 +224,6 @@ test.describe("Registration Form Tests", () => {
   });
 
   test('Invalid "Password" data - No digit', async ({ page }) => {
-    await registrationPage.signUpButton.click();
     await registrationPage.fillRegistrationForm({
       name: "John",
       lastName: "Doe",
@@ -255,7 +244,6 @@ test.describe("Registration Form Tests", () => {
   });
 
   test('Empty "Password" field', async ({ page }) => {
-    await registrationPage.signUpButton.click();
     await registrationPage.passwordInput.click();
     await registrationPage.fillRegistrationForm({
       name: "John",
@@ -274,7 +262,6 @@ test.describe("Registration Form Tests", () => {
   });
 
   test("Passwords do not match", async ({ page }) => {
-    await registrationPage.signUpButton.click();
     await registrationPage.fillRegistrationForm({
       name: "John",
       lastName: "Doe",
@@ -294,7 +281,6 @@ test.describe("Registration Form Tests", () => {
   });
 
   test('Empty "Re-enter password" field', async ({ page }) => {
-    await registrationPage.signUpButton.click();
     await registrationPage.repeatPasswordInput.click();
     await registrationPage.fillRegistrationForm({
       name: "John",
@@ -315,8 +301,6 @@ test.describe("Registration Form Tests", () => {
   test('Button "Register" is disabled when fields are empty', async ({
     page,
   }) => {
-    await registrationPage.signUpButton.click();
-
     const isDisabled = await registrationPage.isRegisterButtonDisabled();
     expect(isDisabled).toBeTruthy();
   });
@@ -324,7 +308,6 @@ test.describe("Registration Form Tests", () => {
   test('Button "Register" is enabled when all fields are valid', async ({
     page,
   }) => {
-    await registrationPage.signUpButton.click();
     await registrationPage.fillRegistrationForm({
       name: "John",
       lastName: "Doe",
