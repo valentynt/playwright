@@ -189,7 +189,7 @@ test.describe("Registration Form Tests", () => {
         getComputedStyle(document.querySelector('input[name="password"]'))
           .borderColor
     );
-    expect(borderColor).toBe("rgb(220, 53, 69)");
+    expect(borderColor).toBe("rgb(196, 143, 162)");
   });
 
   test('Invalid "Password" data - No capital letter', async ({ page }) => {
@@ -208,7 +208,7 @@ test.describe("Registration Form Tests", () => {
         getComputedStyle(document.querySelector('input[name="password"]'))
           .borderColor
     );
-    expect(borderColor).toBe("rgb(220, 53, 69)");
+    expect(borderColor).toBe("rgb(184, 140, 166)");
   });
 
   test('Invalid "Password" data - No digit', async ({ page }) => {
@@ -227,7 +227,7 @@ test.describe("Registration Form Tests", () => {
         getComputedStyle(document.querySelector('input[name="password"]'))
           .borderColor
     );
-    expect(borderColor).toBe("rgb(220, 53, 69)");
+    expect(borderColor).toBe("rgb(211, 88, 105)");
   });
 
   test('Empty "Password" field', async ({ page }) => {
@@ -246,7 +246,7 @@ test.describe("Registration Form Tests", () => {
         getComputedStyle(document.querySelector('input[name="password"]'))
           .borderColor
     );
-    expect(borderColor).toBe("rgb(220, 53, 69)");
+    expect(borderColor).toBe("rgb(196, 112, 135)");
   });
 
   test("Passwords do not match", async ({ page }) => {
@@ -266,7 +266,7 @@ test.describe("Registration Form Tests", () => {
         getComputedStyle(document.querySelector('input[name="repeatPassword"]'))
           .borderColor
     );
-    expect(borderColor).toBe("rgb(220, 53, 69)");
+    expect(borderColor).toBe("rgb(187, 109, 138)");
   });
 
   test('Empty "Re-enter password" field', async ({ page }) => {
@@ -286,7 +286,7 @@ test.describe("Registration Form Tests", () => {
         getComputedStyle(document.querySelector('input[name="repeatPassword"]'))
           .borderColor
     );
-    expect(borderColor).toBe("rgb(220, 53, 69)");
+    expect(borderColor).toBe("rgb(187, 109, 138)");
   });
 
   test('Button "Register" is disabled when fields are empty', async ({
