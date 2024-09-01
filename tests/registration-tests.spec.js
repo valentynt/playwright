@@ -1,289 +1,339 @@
 const { test, expect } = require("@playwright/test");
+const { RegistrationPage } = require("./pages/RegistrationPage");
 
 function generateRandomPrefix(length = 5) {
   return Math.random()
     .toString(36)
     .substring(2, 2 + length);
 }
+
 let emailPrefix;
+let registrationPage;
 
 test.describe("Registration Form Tests", () => {
   test.beforeEach(async ({ page }) => {
     emailPrefix = `aqa_${generateRandomPrefix()}`;
-    await page.goto("https://guest:welcome2qauto@qauto.forstudy.space/");
-    await page.waitForTimeout(10000);
+    registrationPage = new RegistrationPage(page);
+    await registrationPage.navigate();
   });
+
   // Positive scenario
   test("Successful Registration", async ({ page }) => {
-    await page.click("text=Sign up");
-    await page.fill('input[name="name"]', "John");
-    await page.fill('input[name="lastName"]', "Doe");
-    await page.fill('input[name="email"]', `${emailPrefix}-testuser@test.com`);
-    await page.fill('input[name="password"]', "Password123");
-    await page.fill('input[name="repeatPassword"]', "Password123");
-    await page.click("text=Register");
+    await registrationPage.signUpButton.click();
+    await registrationPage.fillRegistrationForm({
+      name: "John",
+      lastName: "Doe",
+      email: `${emailPrefix}-testuser@test.com`,
+      password: "Password123",
+      repeatPassword: "Password123",
+    });
+    await registrationPage.submit();
 
     await expect(page).toHaveURL("https://qauto.forstudy.space/panel/garage");
   });
-  // Negative scenario
-  test('Empty "Name" field', async ({ page }) => {
-    await page.getByRole("button", { name: "Sign up" }).click();
-    await page.locator("#signupName").click();
-    await page.locator("#signupLastName").fill("Doe");
-    await page.getByLabel("Name").fill(`${emailPrefix}-testuser@test.com`);
-    await page.getByLabel("Password", { exact: true }).fill("Password123");
-    await page.getByLabel("Re-enter password").fill("Password123");
-    await page.getByLabel("Password", { exact: true }).click();
-    await expect(page.getByRole("paragraph")).toContainText("Name required");
 
-    const hasErrorClass = await page
-      .locator('input[name="name"]')
-      .evaluate((element) => element.classList.contains("is-invalid"));
-    expect(hasErrorClass).toBeTruthy();
+  // Negative scenarios
+  test('Empty "Name" field', async ({ page }) => {
+    await registrationPage.signUpButton.click();
+    await registrationPage.nameInput.click();
+    await registrationPage.fillRegistrationForm({
+      lastName: "Doe",
+      email: `${emailPrefix}-testuser@test.com`,
+      password: "Password123",
+      repeatPassword: "Password123",
+    });
+
+    const errorMessage = await registrationPage.getErrorMessage();
+    expect(errorMessage).toContain("Name required");
+
+    const isInvalid = await registrationPage.isFieldInvalid(
+      registrationPage.nameInput
+    );
+    expect(isInvalid).toBeTruthy();
   });
 
   test('Invalid "Name" data', async ({ page }) => {
-    await page.getByRole("button", { name: "Sign up" }).click();
-    await page.locator("#signupName").fill("123");
-    await page.locator("#signupLastName").fill("Doe");
-    await page.getByLabel("Name").fill(`${emailPrefix}-testuser@test.com`);
-    await page.getByLabel("Password", { exact: true }).fill("Password123");
-    await page.getByLabel("Re-enter password").fill("Password123");
-    await expect(page.getByRole("paragraph")).toContainText("Name is invalid");
+    await registrationPage.signUpButton.click();
+    await registrationPage.fillRegistrationForm({
+      name: "123",
+      lastName: "Doe",
+      email: `${emailPrefix}-testuser@test.com`,
+      password: "Password123",
+      repeatPassword: "Password123",
+    });
+    await registrationPage.emailInput.click();
 
-    const hasErrorClass = await page
-      .locator('input[name="name"]')
-      .evaluate((element) => element.classList.contains("is-invalid"));
-    expect(hasErrorClass).toBeTruthy();
+    const errorMessage = await registrationPage.getErrorMessage();
+    expect(errorMessage).toContain("Name is invalid");
+
+    const isInvalid = await registrationPage.isFieldInvalid(
+      registrationPage.nameInput
+    );
+    expect(isInvalid).toBeTruthy();
   });
 
   test('Wrong "Name" length', async ({ page }) => {
-    await page.getByRole("button", { name: "Sign up" }).click();
-    await page.locator("#signupName").fill("A");
-    await page.locator("#signupLastName").fill("Doe");
-    await page.getByLabel("Name").fill(`${emailPrefix}-testuser@test.com`);
-    await page.getByLabel("Password", { exact: true }).fill("Password123");
-    await page.getByLabel("Re-enter password").fill("Password123");
-    await expect(page.getByRole("paragraph")).toContainText(
+    await registrationPage.signUpButton.click();
+    await registrationPage.fillRegistrationForm({
+      name: "A",
+      lastName: "Doe",
+      email: `${emailPrefix}-testuser@test.com`,
+      password: "Password123",
+      repeatPassword: "Password123",
+    });
+    await registrationPage.emailInput.click();
+
+    const errorMessage = await registrationPage.getErrorMessage();
+    expect(errorMessage).toContain(
       "Name has to be from 2 to 20 characters long"
     );
 
-    const hasErrorClass = await page
-      .locator('input[name="name"]')
-      .evaluate((element) => element.classList.contains("is-invalid"));
-    expect(hasErrorClass).toBeTruthy();
+    const isInvalid = await registrationPage.isFieldInvalid(
+      registrationPage.nameInput
+    );
+    expect(isInvalid).toBeTruthy();
   });
 
   test('Empty "Last name" field', async ({ page }) => {
-    await page.getByRole("button", { name: "Sign up" }).click();
-    await page.locator("#signupName").fill("John");
-    await page.locator("#signupLastName").click();
-    await page.getByLabel("Name").fill(`${emailPrefix}-testuser@test.com`);
-    await page.getByLabel("Password", { exact: true }).fill("Password123");
-    await page.getByLabel("Re-enter password").fill("Password123");
-    await expect(page.getByRole("paragraph")).toContainText(
-      "Last name required"
-    );
+    await registrationPage.signUpButton.click();
+    await registrationPage.lastNameInput.click();
+    await registrationPage.fillRegistrationForm({
+      name: "John",
+      email: `${emailPrefix}-testuser@test.com`,
+      password: "Password123",
+      repeatPassword: "Password123",
+    });
 
-    const hasErrorClass = await page
-      .locator('input[name="lastName"]')
-      .evaluate((element) => element.classList.contains("is-invalid"));
-    expect(hasErrorClass).toBeTruthy();
+    const errorMessage = await registrationPage.getErrorMessage();
+    expect(errorMessage).toContain("Last name required");
+
+    const isInvalid = await registrationPage.isFieldInvalid(
+      registrationPage.lastNameInput
+    );
+    expect(isInvalid).toBeTruthy();
   });
 
   test('Invalid "Last name" data', async ({ page }) => {
-    await page.getByRole("button", { name: "Sign up" }).click();
-    await page.locator("#signupName").fill("John");
-    await page.locator("#signupLastName").fill("123");
-    await page.getByLabel("Name").fill(`${emailPrefix}-testuser@test.com`);
-    await page.getByLabel("Password", { exact: true }).fill("Password123");
-    await page.getByLabel("Re-enter password").fill("Password123");
-    await expect(page.getByRole("paragraph")).toContainText(
-      "Last name is invalid"
-    );
+    await registrationPage.signUpButton.click();
+    await registrationPage.fillRegistrationForm({
+      name: "John",
+      lastName: "123",
+      email: `${emailPrefix}-testuser@test.com`,
+      password: "Password123",
+      repeatPassword: "Password123",
+    });
 
-    const hasErrorClass = await page
-      .locator('input[name="lastName"]')
-      .evaluate((element) => element.classList.contains("is-invalid"));
-    expect(hasErrorClass).toBeTruthy();
+    const errorMessage = await registrationPage.getErrorMessage();
+    expect(errorMessage).toContain("Last name is invalid");
+
+    const isInvalid = await registrationPage.isFieldInvalid(
+      registrationPage.lastNameInput
+    );
+    expect(isInvalid).toBeTruthy();
   });
 
   test('Wrong "Last name" length', async ({ page }) => {
-    await page.getByRole("button", { name: "Sign up" }).click();
-    await page.locator("#signupName").fill("John");
-    await page.locator("#signupLastName").fill("A");
-    await page.getByLabel("Name").fill(`${emailPrefix}-testuser@test.com`);
-    await page.getByLabel("Password", { exact: true }).fill("Password123");
-    await page.getByLabel("Re-enter password").fill("Password123");
-    await expect(page.getByRole("paragraph")).toContainText(
+    await registrationPage.signUpButton.click();
+    await registrationPage.fillRegistrationForm({
+      name: "John",
+      lastName: "A",
+      email: `${emailPrefix}-testuser@test.com`,
+      password: "Password123",
+      repeatPassword: "Password123",
+    });
+
+    const errorMessage = await registrationPage.getErrorMessage();
+    expect(errorMessage).toContain(
       "Last name has to be from 2 to 20 characters long"
     );
 
-    const hasErrorClass = await page
-      .locator('input[name="lastName"]')
-      .evaluate((element) => element.classList.contains("is-invalid"));
-    expect(hasErrorClass).toBeTruthy();
+    const isInvalid = await registrationPage.isFieldInvalid(
+      registrationPage.lastNameInput
+    );
+    expect(isInvalid).toBeTruthy();
   });
 
   test('Invalid "Email" format', async ({ page }) => {
-    await page.getByRole("button", { name: "Sign up" }).click();
-    await page.locator("#signupName").fill("John");
-    await page.locator("#signupLastName").fill("Doe");
-    await page.getByLabel("Name").fill("invalid-email");
-    await page.getByLabel("Password", { exact: true }).fill("Password123");
-    await page.getByLabel("Re-enter password").fill("Password123");
-    await expect(page.getByRole("paragraph")).toContainText(
-      "Email is incorrect"
-    );
+    await registrationPage.signUpButton.click();
+    await registrationPage.fillRegistrationForm({
+      name: "John",
+      lastName: "Doe",
+      email: "invalid-email",
+      password: "Password123",
+      repeatPassword: "Password123",
+    });
 
-    const hasErrorClass = await page
-      .locator('input[name="email"]')
-      .evaluate((element) => element.classList.contains("is-invalid"));
-    expect(hasErrorClass).toBeTruthy();
+    const errorMessage = await registrationPage.getErrorMessage();
+    expect(errorMessage).toContain("Email is incorrect");
+
+    const isInvalid = await registrationPage.isFieldInvalid(
+      registrationPage.emailInput
+    );
+    expect(isInvalid).toBeTruthy();
   });
 
   test('Empty "Email" field', async ({ page }) => {
-    await page.getByRole("button", { name: "Sign up" }).click();
-    await page.locator("#signupName").fill("John");
-    await page.locator("#signupLastName").fill("Doe");
-    await page.getByLabel("Name").click();
-    await page.getByLabel("Password", { exact: true }).fill("Password123");
-    await page.getByLabel("Re-enter password").fill("Password123");
-    await expect(page.getByRole("paragraph")).toContainText("Email required");
+    await registrationPage.signUpButton.click();
+    await registrationPage.emailInput.click();
+    await registrationPage.fillRegistrationForm({
+      name: "John",
+      lastName: "Doe",
+      password: "Password123",
+      repeatPassword: "Password123",
+    });
 
-    const hasErrorClass = await page
-      .locator('input[name="email"]')
-      .evaluate((element) => element.classList.contains("is-invalid"));
-    expect(hasErrorClass).toBeTruthy();
+    const errorMessage = await registrationPage.getErrorMessage();
+    expect(errorMessage).toContain("Email required");
+
+    const isInvalid = await registrationPage.isFieldInvalid(
+      registrationPage.emailInput
+    );
+    expect(isInvalid).toBeTruthy();
   });
 
   test('Invalid "Password" data - Less than 8 characters', async ({ page }) => {
-    await page.getByRole("button", { name: "Sign up" }).click();
-    await page.locator("#signupName").fill("John");
-    await page.locator("#signupLastName").fill("Doe");
-    await page.getByLabel("Name").fill(`${emailPrefix}-testuser@test.com`);
-    await page.getByLabel("Password", { exact: true }).fill("Pass1");
-    await page.getByLabel("Re-enter password").fill("Pass1");
-    await expect(page.getByRole("paragraph")).toContainText(
+    await registrationPage.signUpButton.click();
+    await registrationPage.fillRegistrationForm({
+      name: "John",
+      lastName: "Doe",
+      email: `${emailPrefix}-testuser@test.com`,
+      password: "Pass1",
+      repeatPassword: "Pass1",
+    });
+
+    const errorMessage = await registrationPage.getErrorMessage();
+    expect(errorMessage).toContain(
       "Password has to be from 8 to 15 characters long and contain at least one integer, one capital, and one small letter"
     );
 
-    const hasErrorClass = await page
-      .locator('input[name="password"]')
-      .evaluate((element) => element.classList.contains("is-invalid"));
-    expect(hasErrorClass).toBeTruthy();
+    const isInvalid = await registrationPage.isFieldInvalid(
+      registrationPage.passwordInput
+    );
+    expect(isInvalid).toBeTruthy();
   });
 
   test('Invalid "Password" data - No capital letter', async ({ page }) => {
-    await page.getByRole("button", { name: "Sign up" }).click();
-    await page.locator("#signupName").fill("John");
-    await page.locator("#signupLastName").fill("Doe");
-    await page.getByLabel("Name").fill(`${emailPrefix}-testuser@test.com`);
-    await page.getByLabel("Password", { exact: true }).fill("password1");
-    await page.getByLabel("Re-enter password").fill("password1");
-    await expect(page.getByRole("paragraph")).toContainText(
+    await registrationPage.signUpButton.click();
+    await registrationPage.fillRegistrationForm({
+      name: "John",
+      lastName: "Doe",
+      email: `${emailPrefix}-testuser@test.com`,
+      password: "password1",
+      repeatPassword: "password1",
+    });
+
+    const errorMessage = await registrationPage.getErrorMessage();
+    expect(errorMessage).toContain(
       "Password has to be from 8 to 15 characters long and contain at least one integer, one capital, and one small letter"
     );
 
-    const hasErrorClass = await page
-      .locator('input[name="password"]')
-      .evaluate((element) => element.classList.contains("is-invalid"));
-    expect(hasErrorClass).toBeTruthy();
+    const isInvalid = await registrationPage.isFieldInvalid(
+      registrationPage.passwordInput
+    );
+    expect(isInvalid).toBeTruthy();
   });
 
   test('Invalid "Password" data - No digit', async ({ page }) => {
-    await page.getByRole("button", { name: "Sign up" }).click();
-    await page.locator("#signupName").fill("John");
-    await page.locator("#signupLastName").fill("Doe");
-    await page.getByLabel("Name").fill(`${emailPrefix}-testuser@test.com`);
-    await page.getByLabel("Password", { exact: true }).fill("Password");
-    await page.getByLabel("Re-enter password").fill("Password");
-    await expect(page.getByRole("paragraph")).toContainText(
+    await registrationPage.signUpButton.click();
+    await registrationPage.fillRegistrationForm({
+      name: "John",
+      lastName: "Doe",
+      email: `${emailPrefix}-testuser@test.com`,
+      password: "Password",
+      repeatPassword: "Password",
+    });
+
+    const errorMessage = await registrationPage.getErrorMessage();
+    expect(errorMessage).toContain(
       "Password has to be from 8 to 15 characters long and contain at least one integer, one capital, and one small letter"
     );
 
-    const hasErrorClass = await page
-      .locator('input[name="password"]')
-      .evaluate((element) => element.classList.contains("is-invalid"));
-    expect(hasErrorClass).toBeTruthy();
+    const isInvalid = await registrationPage.isFieldInvalid(
+      registrationPage.passwordInput
+    );
+    expect(isInvalid).toBeTruthy();
   });
 
   test('Empty "Password" field', async ({ page }) => {
-    await page.getByRole("button", { name: "Sign up" }).click();
-    await page.locator("#signupName").fill("John");
-    await page.locator("#signupLastName").fill("Doe");
-    await page.getByLabel("Name").fill(`${emailPrefix}-testuser@test.com`);
-    await page.getByLabel("Password", { exact: true }).click();
-    await page.getByLabel("Re-enter password").fill("Password123");
-    await expect(page.getByRole("paragraph")).toContainText(
-      "Password required"
-    );
+    await registrationPage.signUpButton.click();
+    await registrationPage.passwordInput.click();
+    await registrationPage.fillRegistrationForm({
+      name: "John",
+      lastName: "Doe",
+      email: `${emailPrefix}-testuser@test.com`,
+      repeatPassword: "Password123",
+    });
 
-    const hasErrorClass = await page
-      .locator('input[name="password"]')
-      .evaluate((element) => element.classList.contains("is-invalid"));
-    expect(hasErrorClass).toBeTruthy();
+    const errorMessage = await registrationPage.getErrorMessage();
+    expect(errorMessage).toContain("Password required");
+
+    const isInvalid = await registrationPage.isFieldInvalid(
+      registrationPage.passwordInput
+    );
+    expect(isInvalid).toBeTruthy();
   });
 
   test("Passwords do not match", async ({ page }) => {
-    await page.getByRole("button", { name: "Sign up" }).click();
-    await page.locator("#signupName").fill("John");
-    await page.locator("#signupLastName").fill("Doe");
-    await page.getByLabel("Name").fill(`${emailPrefix}-testuser@test.com`);
-    await page.getByLabel("Password", { exact: true }).fill("Password123");
-    await page.getByLabel("Re-enter password").fill("Password321");
-    await page.getByLabel("Password", { exact: true }).click();
-    await expect(page.getByRole("paragraph")).toContainText(
-      "Passwords do not match"
-    );
+    await registrationPage.signUpButton.click();
+    await registrationPage.fillRegistrationForm({
+      name: "John",
+      lastName: "Doe",
+      email: `${emailPrefix}-testuser@test.com`,
+      password: "Password123",
+      repeatPassword: "Password321",
+    });
+    await registrationPage.emailInput.click();
 
-    const hasErrorClass = await page
-      .locator('input[name="repeatPassword"]')
-      .evaluate((element) => element.classList.contains("is-invalid"));
-    expect(hasErrorClass).toBeTruthy();
+    const errorMessage = await registrationPage.getErrorMessage();
+    expect(errorMessage).toContain("Passwords do not match");
+
+    const isInvalid = await registrationPage.isFieldInvalid(
+      registrationPage.repeatPasswordInput
+    );
+    expect(isInvalid).toBeTruthy();
   });
 
   test('Empty "Re-enter password" field', async ({ page }) => {
-    await page.getByRole("button", { name: "Sign up" }).click();
-    await page.locator("#signupName").fill("John");
-    await page.locator("#signupLastName").fill("Doe");
-    await page.getByLabel("Name").fill(`${emailPrefix}-testuser@test.com`);
-    await page.getByLabel("Password", { exact: true }).fill("Password123");
-    await page.getByLabel("Re-enter password").click();
-    await page.getByLabel("Password", { exact: true }).click();
-    await expect(page.getByRole("paragraph")).toContainText(
-      "Re-enter password required"
-    );
+    await registrationPage.signUpButton.click();
+    await registrationPage.repeatPasswordInput.click();
+    await registrationPage.fillRegistrationForm({
+      name: "John",
+      lastName: "Doe",
+      email: `${emailPrefix}-testuser@test.com`,
+      password: "Password123",
+    });
 
-    const hasErrorClass = await page
-      .locator('input[name="repeatPassword"]')
-      .evaluate((element) => element.classList.contains("is-invalid"));
-    expect(hasErrorClass).toBeTruthy();
+    const errorMessage = await registrationPage.getErrorMessage();
+    expect(errorMessage).toContain("Re-enter password required");
+
+    const isInvalid = await registrationPage.isFieldInvalid(
+      registrationPage.repeatPasswordInput
+    );
+    expect(isInvalid).toBeTruthy();
   });
 
   test('Button "Register" is disabled when fields are empty', async ({
     page,
   }) => {
-    await page.getByRole("button", { name: "Sign up" }).click();
-    const isDisabled = await page
-      .getByRole("button", { name: "Register" })
-      .isDisabled();
+    await registrationPage.signUpButton.click();
+
+    const isDisabled = await registrationPage.isRegisterButtonDisabled();
     expect(isDisabled).toBeTruthy();
   });
 
   test('Button "Register" is enabled when all fields are valid', async ({
     page,
   }) => {
-    await page.click("text=Sign up");
-    await page.fill('input[name="name"]', "John");
-    await page.fill('input[name="lastName"]', "Doe");
-    await page.fill('input[name="email"]', `${emailPrefix}-testuser@test.com`);
-    await page.fill('input[name="password"]', "Password123");
-    await page.fill('input[name="repeatPassword"]', "Password123");
+    await registrationPage.signUpButton.click();
+    await registrationPage.fillRegistrationForm({
+      name: "John",
+      lastName: "Doe",
+      email: `${emailPrefix}-testuser@test.com`,
+      password: "Password123",
+      repeatPassword: "Password123",
+    });
 
-    const isEnabled = await page
-      .getByRole("button", { name: "Register" })
-      .isEnabled();
+    const isEnabled = await registrationPage.registerButton.isEnabled();
     expect(isEnabled).toBeTruthy();
   });
 });
