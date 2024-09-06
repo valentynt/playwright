@@ -1,47 +1,33 @@
 import { defineConfig } from "@playwright/test";
+import dotenv from "dotenv";
+
+dotenv.config(); // Загрузка переменных окружения
 
 export default defineConfig({
   use: {
-    // Установка браузера Chromium
+    baseURL: process.env.BASE_URL || "https://default-url.com",
+
+    httpCredentials: {
+      username: process.env.HTTP_USERNAME || "default-username",
+      password: process.env.HTTP_PASSWORD || "default-password",
+    },
+
+    // Остальные настройки
     browserName: "chromium",
-
-    // Размер окна браузера
     viewport: { width: 1280, height: 720 },
-
-    // Запуск в режиме без головы (headless)
     headless: true,
-
-    // Запись видео выполнения тестов
-    video: "retain-on-failure", // сохранять видео только при ошибках
-
-    // Запись трассировки тестов
-    trace: "retain-on-failure", // сохранять трассировку только при ошибках
-
-    // Снимки экрана при ошибках
+    video: "retain-on-failure",
+    trace: "retain-on-failure",
     screenshot: "only-on-failure",
-
-    // Тайм-аут ожидания для всех действий
-    actionTimeout: 10000, // 10 секунд
-
-    // Стандартный тайм-аут для тестов
-    timeout: 30000, // 30 секунд
-
-    // Базовый URL для тестов
-    baseURL: "https://example.com",
-
-    // Включение сообщений журнала
+    actionTimeout: 10000,
+    timeout: 30000,
     launchOptions: {
-      slowMo: 50, // замедление выполнения на 50ms для видимости
-      args: ["--start-maximized"], // запуск в развернутом окне
+      slowMo: 50,
+      args: ["--start-maximized"],
     },
   },
 
-  // Конфигурация параллельных тестов
-  workers: 4, // Количество параллельно выполняемых тестов
-
-  // Папка для хранения артефактов тестирования
+  workers: 4,
   outputDir: "test-results/",
-
-  // Настройка отчетности
   reporter: [["html", { open: "never" }]],
 });

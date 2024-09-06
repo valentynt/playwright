@@ -12,7 +12,8 @@ class RegistrationPage {
   }
 
   async navigate() {
-    await this.page.goto("https://guest:welcome2qauto@qauto.forstudy.space/");
+    const baseURL = process.env.BASE_URL;
+    await this.page.goto(baseURL);
   }
 
   async fillRegistrationForm({
