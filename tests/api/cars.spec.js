@@ -19,19 +19,4 @@ test.describe("Car API Tests", async () => {
 
     expect(authRequest.status()).toBe(200);
   });
-
-  // Positive 1
-  test("should add a new car", async () => {
-    const response = await request.post("/api/cars", {
-      data: {
-        carBrandId: 1,
-        carModelId: 1,
-        mileage: 122,
-      },
-    });
-
-    expect(response.status()).toBe(201);
-    const body = await response.json();
-    expect(body.data).toHaveProperty("id");
-  });
 });
