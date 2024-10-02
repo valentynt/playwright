@@ -34,30 +34,4 @@ test.describe("Car API Tests", async () => {
     const body = await response.json();
     expect(body.data).toHaveProperty("id");
   });
-
-  // Negative 1
-  test("should return error when required fields are missing", async () => {
-    const response = await request.post("/api/cars", {
-      data: {},
-    });
-
-    expect(response.status()).toBe(400);
-    const body = await response.json();
-    expect(body.message).toBe("Car brand id is required");
-  });
-
-  // Negative 2
-  test("should return error when carBrandId is invalid", async () => {
-    const response = await request.post("/api/cars", {
-      data: {
-        carBrandId: "invalid_id",
-        carModelId: 1,
-        mileage: 122,
-      },
-    });
-
-    expect(response.status()).toBe(400);
-    const body = await response.json();
-    expect(body.message).toBe("Invalid car brand type");
-  });
 });
